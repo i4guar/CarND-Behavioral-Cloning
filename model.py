@@ -19,7 +19,12 @@ samples = []
 with open(csv_path,'r') as f:
     reader = csv.reader(f)
     for line in reader:
-       samples.append(line)        
+        # append a column in row indicating if image is flipped (1: is not flipped and -1 that it should be flipped)
+        unflipped = line + [1]
+        flipped = line + [-1]
+        samples.append(unflipped)
+        samples.append(flipped)        
+      
 
     
 from sklearn.model_selection import train_test_split
@@ -51,9 +56,16 @@ def generator(samples, batch_size=32):
                 img_left = np.asarray(Image.open(batch_sample[1]))
                 img_right = np.asarray(Image.open(batch_sample[2]))
 
-                # add to data set
-                images.extend([img_center, img_left, img_right])
-                angles.extend([steering_center, steering_left, steering_right])
+                # deciding if sample should be flipped
+                if batch_sample[-1] < 0:
+                    # add flipped image to dataset
+                    # flipping image and argument data
+                    images.extend([np.fliplr(img_center), np.fliplr(img_left), np.fliplr(img_right)])
+                    angles.extend([-steering_center, -steering_left, -steering_right])
+                else:
+                    # add unflipped data set
+                    images.extend([img_center, img_left, img_right])
+                    angles.extend([steering_center, steering_left, steering_right])
 
             X_train = np.array(images)
             y_train = np.array(angles)
@@ -70,15 +82,13 @@ validation_generator = generator(validation_samples, batch_size=batch_size)
     
     
     
-# flipping image and argument data
-#image_flipped = np.fliplr(image)
-#measurement_flipped = -measurement
+
 
 
 # architecture http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D, AveragePooling2D
+from keras.layers import Flatten, Dense, Lambda, Cropping2D, Conv2D, AveragePooling2D, Dropout
 model = Sequential()
 #crop image
 model.add(Cropping2D(cropping=((50,20),(0,0)), input_shape=(160,320,3)))
@@ -97,7 +107,9 @@ model.add(Conv2D(filters=64,kernel_size=(3,3), activation='relu'))
 
 model.add(Flatten())
 model.add(Dense(100))
+model.add(Dropout(0.5))
 model.add(Dense(50))
+model.add(Dropout(0.5))
 model.add(Dense(10))
 model.add(Dense(1))
 
