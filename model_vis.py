@@ -1,3 +1,5 @@
+# this file creates the visualization of the model architecture
+
 from keras.models import load_model
 from keras.utils.vis_utils import plot_model
 

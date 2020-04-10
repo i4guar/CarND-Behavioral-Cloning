@@ -84,13 +84,9 @@ The overall strategy for deriving a model architecture was to start out with the
 
 In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
 
-To combat the overfitting, I modified the model so that ...
+To combat the overfitting, I modified the model and added the Dropout layers. Then I also added flipped images to the training set and a lap around the track clockwise.
 
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+The final step was to run the simulator to see how well the car was driving around track one. I was suprised and the car was able to drive autonomously around the track without leaving the road without further manipulation or testing.
 
 #### 2. Final Model Architecture
 
@@ -104,13 +100,31 @@ Here is a visualization of the architecture
 
 To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
 
+![alt text][input]
+
+I also used the left and the right camera of the car and adjusted the steering angle with a small correction.
+
 Then I repeated this process in the opposite direction to mitigate the left turn bias gained by using a closed track driving counter-clockwise.
 
 To augment the data set, I also flipped images and angles thinking that this would prevent the model from overfitting and also increasing the training and validation sample size.
 
+Here is an expamle of an flipped image. It looks of course very similar to the non-flipped images but the road is slightly curved to the right instead of left.
+
+![alt text][flipped]
+
+
 After the collection process, I had about 40000 number of data points.
 I didn't preprocess the data as this is done by the first two layers in the model.
 
+The first layer clips the image, like this
+
+![alt text][clipped]
+
 I finally randomly shuffled the data set and put Y% of the data into a validation set. 
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 5. I used an adam optimizer so that manually training the learning rate wasn't necessary.
+
+Here is the plot for the mean squared error loss for the training and validation set
+
+![alt text][training1]
+
